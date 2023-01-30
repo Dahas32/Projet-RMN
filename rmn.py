@@ -12,17 +12,21 @@ def read_rmn(file: str):
     data_list = [[]]
     current_dimension = 0
     start_data = len(o_file_list) + 1
+    XDIM=False;End=False;abs_f1=False;abs_f2=False
     for i in enumerate(o_file_list, 0):  # the data isn't alway at the same place.
-        if "##$XDIM" in i[1]:
+        if not(XDIM) and("##$XDIM" in i[1]):
             n_point = int(i[1][9:-1])
+            XDIM=True
 
-        if "$$ End of Bruker specific parameters" in i[1]:
+        if not(End) and ("$$ End of Bruker specific parameters" in i[1]):
             start = i[0] + 1
+            End=True
 
-        if "##$ABSF1" in i[1]:
+        if not(abs_f1) and ("##$ABSF1" in i[1]):
             max_ppm = float(i[1][10:-1])
+            abs_f1=True
 
-        if "##$ABSF2" in i[1]:
+        if not(abs_f2) and("##$ABSF2" in i[1]):
             min_ppm = float(i[1][10:-1])
 
         if i[0] > start and ("##" not in i[1]):
