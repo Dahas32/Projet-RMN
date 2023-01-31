@@ -34,6 +34,27 @@ def test_determination_buckets_1D_3():
     ]
 
 
+def test_determination_buckets_1D_4():
+    liste_test3 = [[[(i * 0.5, 0) for i in range(0,10,1)]]]
+    liste_test3_1 = [[[(i * 0.5, 0) for i in range(10,0,-1)]]]
+    taille_bucket_ppm = 0.5
+
+    assert determination_des_buckets(liste_test3, taille_bucket_ppm) == [
+        [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7), (7, 8), (8, 9)]
+    ]
+    assert determination_des_buckets(liste_test3_1, taille_bucket_ppm) == [
+        [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7), (7, 8), (8, 9)]
+    ]
+
+
+def test_determination_buckets_1D_5():
+    liste_test1 = [[[(i, 0) for i in range(-5,17,1)]]]
+    liste_test2 = [[[(i, 0) for i in range(17,-5,-1)]]]
+    taille_bucket_ppm = 3
+
+    assert determination_des_buckets(liste_test1, taille_bucket_ppm) == determination_des_buckets(liste_test2, taille_bucket_ppm)
+
+
 def test_determination_buckets_2D_1():
     liste_test4 = [
         [[(i * 0.5, 0) for i in range(10)], [(i * 0.5, 0) for i in range(10)]]

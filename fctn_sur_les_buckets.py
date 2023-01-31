@@ -17,12 +17,17 @@ def determination_des_buckets(data_list, taille_buckets_ppm):
     for i in range(number_of_dimension):
         buckets_list += [[]]
         current_dimension = i
-        valeur_dernier_ppm = data_list[0][current_dimension][-1][0]
-        taille_buckets_index = floor(
-            (taille_buckets_ppm)
-            * ((len(data_list[0][current_dimension]) - 1) / valeur_dernier_ppm)
-        )
+
         index_dernier_ppm = len(data_list[0][current_dimension]) - 1
+        valeur_premier_ppm = data_list[0][current_dimension][0][0]
+        valeur_dernier_ppm = data_list[0][current_dimension][-1][0]
+        if abs(valeur_premier_ppm)<=abs(valeur_dernier_ppm):
+            max_valeur_ppm = abs(valeur_dernier_ppm)
+        else:
+            max_valeur_ppm = abs(valeur_premier_ppm-1)
+        taille_buckets_index = floor(
+            (taille_buckets_ppm)*(index_dernier_ppm/max_valeur_ppm)
+        )
         index_current_ppm = 0
 
         while (index_current_ppm + 1) * taille_buckets_index <= index_dernier_ppm:
