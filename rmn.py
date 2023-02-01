@@ -3,7 +3,7 @@
 
 def read_rmn(file: str):
     """ read the "File" and return a list w/ all the needed information ->
-     [n_point,[[data_dim1,data_dim2,...]]] where data_dim1 is a list of couple
+     [n_point,[data_dim1,data_dim2,...]] where data_dim1 is a list of couple
      the couple is two float like this (ppm,amplitude)"""
     # I will use [a:-1] to remove useless part of the data.
     o_file = open(file, "r")
