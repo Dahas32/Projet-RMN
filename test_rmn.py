@@ -18,3 +18,8 @@ def test_read_1d():
         print(donne)
     # print(test_data)
     print(output[1][0][-1])
+
+
+'''def test_read_2d():
+    """test for 2d"""
+    output=rmn.read_rmn("test_data/serum_dynamic_221125.dx")'''

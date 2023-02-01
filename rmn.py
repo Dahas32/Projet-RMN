@@ -1,5 +1,7 @@
 """this is the code of the programm"""
 
+import matplotlib.pyplot as plt
+
 
 def read_rmn(file: str):
     """ read the "File" and return a list w/ all the needed information ->
@@ -11,40 +13,64 @@ def read_rmn(file: str):
     start = len(o_file_list) + 1
     data_list = [[]]
     current_dimension = 0
-    start_data = len(o_file_list) + 1
-    XDIM=False;End=False;abs_f1=False;abs_f2=False
+    XDIM = False
+    End = False
+    abs_f1 = False
+    abs_f2 = False
+    vardim = False
+    n_dim = 1
     for i in enumerate(o_file_list, 0):  # the data isn't alway at the same place.
-        if not(XDIM) and("##$XDIM" in i[1]):
-            n_point = int(i[1][9:-1])
-            XDIM=True
+        if not (XDIM) and ("##NPOINTS" in i[1]) and ("$$" not in i[1]):
+            print(i[1])
+            print()
+            n_point = int(i[1][11:-1])
+            XDIM = True
 
-        if not(End) and ("$$ End of Bruker specific parameters" in i[1]):
-            start = i[0] + 1
-            End=True
+        if not (End) and ("$$ End of Bruker specific parameters" in i[1]):
+            start = i[0] + 17
+            End = True
 
-        if not(abs_f1) and ("##$ABSF1" in i[1]):
+        if not (abs_f1) and ("##$ABSF1" in i[1]):
             max_ppm = float(i[1][10:-1])
-            abs_f1=True
+            abs_f1 = True
 
-        if not(abs_f2) and("##$ABSF2" in i[1]):
+        if not (abs_f2) and ("##$ABSF2" in i[1]):
             min_ppm = float(i[1][10:-1])
+
+        if not (vardim) and ("##VAR_DIM" in i[1]):
+            vardimaslist = i[1].split()
+            n_point = int(vardimaslist[2][:-1])
+            n_dim = int(vardimaslist[1][:-1])
+            vardim = True
 
         if i[0] > start and ("##" not in i[1]):
             point = i[1].split()
             point[0] = int(point[0]) * ((max_ppm - min_ppm) / n_point) + min_ppm
             point[1] = float(point[1])
             data_list[current_dimension].append(point)
-            start_data = i[0] + n_point
 
-        if i[0] > start_data:
-            data_list.append(list())
+        elif (i[0] > start) and ("##END" not in i[1]):
+            print(i[1])
+            data_list.append([])
             current_dimension += 1
-            start = start_data
+            start = i[0] + 3
+        # print(n_point, data_list)
+    return [n_point, data_list, n_dim]
 
-    # print(n_point, data_list)
 
-    return [n_point, data_list]
+def afficher(rawdata, dim):
+    """take rawdata and show the spectrum"""
+    dim = dim - 1
+    points = [rawdata[1][dim][i][0] for i in range(len(rawdata[1][dim]))]
+    amplitude = [rawdata[1][dim][i][1] for i in range(len(rawdata[1][dim]))]
+    print(points[0])
+    points.reverse()
+    amplitude.reverse()
+    print(points[0])
+    (line,) = plt.plot(points, amplitude, linewidth=float("0.1"))
+    plt.gca().invert_xaxis()
+    line.set_antialiased(False)
 
 
 if __name__ == "__main__":
-    print(read_rmn("test_data/1D.dx"))
+    print(read_rmn("test_data/serum_dynamic_221125.dx"))
