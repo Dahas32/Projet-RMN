@@ -1,6 +1,8 @@
 """this is the code of the programm"""
 
 import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+from numpy import exp
 
 
 def read_rmn(file: str):
@@ -72,5 +74,28 @@ def afficher(rawdata, dim):
     line.set_antialiased(False)
 
 
+def model_t0(x, i0, t0):
+    return i0 * (1 - 2 * exp((-x) / t0))
+
+
+def fitting(bucket_int, delta):
+    x = [i * delta for i in range(len(bucket_int))]
+    print(x, bucket_int)
+    p0 = [100, 1]
+    popt, pops = curve_fit(model_t0, x, bucket_int, p0)
+    return (popt, pops)
+
+
+def afficher_coube_model(ndim, delta, i0, t0):
+    x = [i * delta for i in range(ndim)]
+    y = []
+    for i in x:
+        print(i)
+        y.append(model_t0(i, i0, t0))
+    print(x, y)
+    plt.plot(x, y)
+
+
 if __name__ == "__main__":
-    print(read_rmn("test_data/serum_dynamic_221125.dx"))
+    afficher_coube_model(12, 7.7, 7.90304580e04, -7.94691988e07)
+    plt.show()
