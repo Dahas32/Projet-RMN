@@ -9,7 +9,8 @@ import matplotlib.pyplot as plt
 
 def main():
     """main function"""
-    data = rmn.read_rmn(input("file path"))
+    path = input("file path")
+    data = rmn.read_rmn(path)
     rmn.afficher(data, 5)
     plt.show()
     bucket_size = input("donner la taille des buckets(ppm) voulue : ")
@@ -47,8 +48,10 @@ def main():
     )
     resfit = rmn.fitting(integral_bucket_1_f, delta_t)
     rmn.afficher_coube_model(len(integral_bucket_1_f), delta_t, *resfit[0])
+    plt.savefig("./export/img/image.png")
     print(resfit)
     plt.show()
+    rmn.export_csv(data[1], bucket_list, resfit[0], path)
 
 
 if __name__ == "__main__":

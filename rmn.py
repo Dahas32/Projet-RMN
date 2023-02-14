@@ -3,7 +3,7 @@
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from numpy import exp
-
+import csv
 
 def read_rmn(file: str):
     """ read the "File" and return a list w/ all the needed information ->
@@ -94,6 +94,41 @@ def afficher_coube_model(ndim, delta, i0, t0):
         y.append(model_t0(i, i0, t0))
     print(x, y)
     plt.plot(x, y)
+
+def export_csv(data_list, buckets_list, resfit, input):
+    """data_list: [[data_dim1],[data_dim2],...]], buckets_list: [[buckets_dim1],[bucket_dim2],...],
+    resfit : [int,int], input: str
+    """
+    number_of_dimension = len(data_list)
+
+    for n in range(number_of_dimension):
+        parametre = 4
+
+        if "/" in input:
+            name = str(input.split("/")[-1]) + "_" + str(n)
+        else:
+            name = str(input.split("\\")[-1]) + "_" + str(n)
+
+        header = [name, parametre]
+
+        data = [["" for j in range(len(buckets_list[n]))] for i in range(parametre + 1)]
+
+        for i in range(len(buckets_list[n])):
+            data[0][i] = "bucket" + str(i + 1)
+
+            data[1][i] = data_list[n][buckets_list[n][i][0]][0]
+            data[2][i] = data_list[n][buckets_list[n][i][1]][0]
+            data[3][i] = resfit
+            data[4][i] = '=LIEN_HYPERTEXTE("./img/image.png";"Lien")'
+
+        with open(
+            "./export/data{0}.csv".format(n), "w", encoding="UTF8", newline=""
+        ) as f:
+            writer = csv.writer(f, delimiter=";")
+
+            writer.writerow(header)
+
+            writer.writerows(data)
 
 
 if __name__ == "__main__":
