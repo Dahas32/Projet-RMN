@@ -5,10 +5,11 @@ from scipy.optimize import curve_fit
 from numpy import exp
 import csv
 
+
 def read_rmn(file: str):
-    """ read the "File" and return a list w/ all the needed information ->
-     [n_point,[data_dim1,data_dim2,...]] where data_dim1 is a list of couple
-     the couple is two float like this (ppm,amplitude)"""
+    """read the "File" and return a list w/ all the needed information ->
+    [n_point,[data_dim1,data_dim2,...]] where data_dim1 is a list of couple
+    the couple is two float like this (ppm,amplitude)"""
     # I will use [a:-1] to remove useless part of the data.
     o_file = open(file, "r")
     o_file_list = o_file.readlines()
@@ -23,8 +24,8 @@ def read_rmn(file: str):
     n_dim = 1
     for i in enumerate(o_file_list, 0):  # the data isn't alway at the same place.
         if not (XDIM) and ("##NPOINTS" in i[1]) and ("$$" not in i[1]):
-            print(i[1])
-            print()
+            # print(i[1])
+            # print()
             n_point = int(i[1][11:-1])
             XDIM = True
 
@@ -52,7 +53,7 @@ def read_rmn(file: str):
             data_list[current_dimension].append(point)
 
         elif (i[0] > start) and ("##END" not in i[1]):
-            print(i[1])
+            # print(i[1])
             data_list.append([])
             current_dimension += 1
             start = i[0] + 3
@@ -90,45 +91,43 @@ def afficher_coube_model(ndim, delta, i0, t0):
     x = [i * delta for i in range(ndim)]
     y = []
     for i in x:
-        print(i)
+        # print(i)
         y.append(model_t0(i, i0, t0))
-    print(x, y)
+    # print(x, y)
     plt.plot(x, y)
 
-def export_csv(data_list, buckets_list, resfit, input):
+
+def export_csv(data_list, buckets_list, input, resfit_list):
     """data_list: [[data_dim1],[data_dim2],...]], buckets_list: [[buckets_dim1],[bucket_dim2],...],
     resfit : [int,int], input: str
     """
-    number_of_dimension = len(data_list)
 
-    for n in range(number_of_dimension):
-        parametre = 4
+    parametre = 4
+    
+    if "/" in input:
+            name = str(input.split("/")[-1])
+    else:
+        name = str(input.split("\\")[-1])
 
-        if "/" in input:
-            name = str(input.split("/")[-1]) + "_" + str(n)
-        else:
-            name = str(input.split("\\")[-1]) + "_" + str(n)
 
-        header = [name, parametre]
+    header = [name, parametre]
 
-        data = [["" for j in range(len(buckets_list[n]))] for i in range(parametre + 1)]
+    data = [["" for j in range(len(buckets_list[0]))] for i in range(parametre + 1)]
 
-        for i in range(len(buckets_list[n])):
-            data[0][i] = "bucket" + str(i + 1)
+    for i in range(len(buckets_list[0])):
+        data[0][i] = "bucket" + str(i + 1)
 
-            data[1][i] = data_list[n][buckets_list[n][i][0]][0]
-            data[2][i] = data_list[n][buckets_list[n][i][1]][0]
-            data[3][i] = resfit
-            data[4][i] = '=LIEN_HYPERTEXTE("./img/image.png";"Lien")'
+        data[1][i] = data_list[0][buckets_list[0][i][0]][0]
+        data[2][i] = data_list[0][buckets_list[0][i][1]][0]
+        data[3][i] = resfit_list[i]
+        data[4][i] = '=LIEN_HYPERTEXTE("./img/bucket_{}.png";"Lien")'.format(i)
 
-        with open(
-            "./export/data{0}.csv".format(n), "w", encoding="UTF8", newline=""
-        ) as f:
-            writer = csv.writer(f, delimiter=";")
+    with open("./export/data.csv", "w", encoding="UTF8", newline="") as f:
+        writer = csv.writer(f, delimiter=";")
 
-            writer.writerow(header)
+        writer.writerow(header)
 
-            writer.writerows(data)
+        writer.writerows(data)
 
 
 if __name__ == "__main__":
