@@ -6,6 +6,9 @@ import rmn
 import fctn_sur_les_buckets as rmn_bucket
 import matplotlib.pyplot as plt
 import time
+import os
+import shutil
+
 
 def main():
     """main function"""
@@ -25,14 +28,14 @@ def main():
             correct = False
     bucket_list = rmn_bucket.determination_des_buckets(data[1], bucket_size)
     bucket_int_list = rmn_bucket.calcul_des_integrales(bucket_list, data[1])
+    nb_bucket = len(bucket_int_list[0])
+    nb_dim = data[2]
     integral_buckets_list = [
-        [bucket_int_list[i][a] for i in range(data[2])]
-        for a in range(len(bucket_int_list[0]))
+        [bucket_int_list[i][a] for i in range(nb_dim)] for a in range(nb_bucket)
     ]
 
     integral_buckets_f_list = [
-        [j for j in integral_buckets_list[i] if j != 0.0]
-        for i in range(len(integral_buckets_list))
+        [j for j in integral_buckets_list[i] if j != 0.0] for i in range(nb_bucket)
     ]
     delta_t = input("temps entre les spèctre : ")
     correct = False
@@ -45,10 +48,13 @@ def main():
             delta_t = input("donner la taille des buckets(ppm) voulue : ")
             correct = False
 
-
+    directory_export = "./export"
+    if os.path.exists(directory_export):
+        shutil.rmtree(directory_export)
+    os.makedirs(directory_export + "/img/")
     t1 = time.process_time()
     resfit_list = []
-    for b in range(len(integral_buckets_f_list)):
+    for b in range(nb_bucket):
         plt.plot(
             [i * delta_t for i in range(len(integral_buckets_f_list[b]))],
             integral_buckets_f_list[b],
@@ -60,9 +66,12 @@ def main():
         image = "./export/img/bucket_{}.png".format(b)
         plt.savefig(image)
         plt.close()
-    rmn.export_csv(data[1], bucket_list, path, resfit_list)
+    rmn.export_xlsx(data[1], bucket_list, path, resfit_list)
     t2 = time.process_time()
     print("duree :", t2 - t1)
+    quit = input("voulez vous quitter y/n")
+    while quit == "n":
+        quit = input("voulez vous quitter y/n")
 
 
 if __name__ == "__main__":

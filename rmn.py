@@ -3,7 +3,7 @@
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from numpy import exp
-import csv
+import xlsxwriter
 
 
 def read_rmn(file: str):
@@ -97,37 +97,42 @@ def afficher_coube_model(ndim, delta, i0, t0):
     plt.plot(x, y)
 
 
-def export_csv(data_list, buckets_list, input, resfit_list):
+def export_xlsx(data_list, buckets_list, input, resfit_list):
     """data_list: [[data_dim1],[data_dim2],...]], buckets_list: [[buckets_dim1],[bucket_dim2],...],
     resfit : [int,int], input: str
     """
-
+    nb_bucket = len(buckets_list[0])
     parametre = 4
-    
+
     if "/" in input:
-            name = str(input.split("/")[-1])
+        name = str(input.split("/")[-1])
     else:
         name = str(input.split("\\")[-1])
 
+    workbook = xlsxwriter.Workbook("./export/data.xlsx")
+    worksheet = workbook.add_worksheet()
 
-    header = [name, parametre]
+    cell_width = 50
+    cell_height = 200
+    worksheet.set_column(0, len(buckets_list[0]), cell_width)
+    worksheet.set_row(5, cell_height)
 
-    data = [["" for j in range(len(buckets_list[0]))] for i in range(parametre + 1)]
+    worksheet.write(0, 0, name)
+    worksheet.write(0, 1, parametre)
 
-    for i in range(len(buckets_list[0])):
-        data[0][i] = "bucket" + str(i + 1)
+    for i in range(nb_bucket):
+        worksheet.write(1, i, "bucket" + str(i + 1))
+        worksheet.write(2, i, data_list[0][buckets_list[0][i][0]][0])
+        worksheet.write(3, i, data_list[0][buckets_list[0][i][1]][0])
+        worksheet.write(4, i, str(resfit_list[i]))
+        worksheet.insert_image(
+            5,
+            i,
+            "./export/img/bucket_{}.png".format(str(i)),
+            {"object_position": 1, "x_scale": 0.58, "y_scale": 0.57},
+        )
 
-        data[1][i] = data_list[0][buckets_list[0][i][0]][0]
-        data[2][i] = data_list[0][buckets_list[0][i][1]][0]
-        data[3][i] = resfit_list[i]
-        data[4][i] = '=LIEN_HYPERTEXTE("./img/bucket_{}.png";"Lien")'.format(i)
-
-    with open("./export/data.csv", "w", encoding="UTF8", newline="") as f:
-        writer = csv.writer(f, delimiter=";")
-
-        writer.writerow(header)
-
-        writer.writerows(data)
+    workbook.close()
 
 
 if __name__ == "__main__":

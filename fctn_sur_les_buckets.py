@@ -141,13 +141,14 @@ def noise_automate(data_list, buckets_list):
         standard_deviation = int(variance ** (1 / 2))
 
         for i in range(1, length_average_buckets - 1):
-            if (
-                average_buckets[i - 1] / average_buckets[i] < 2
-                and average_buckets[i + 1] / average_buckets[i] < 2
-                and average_buckets[i] > average_of_average_buckets - standard_deviation
-            ):
-                buckets_filter_list[current_dimension].append(
-                    buckets_list[current_dimension][i]
-                )
+            if average_buckets[i] != 0:
+                if (
+                    average_buckets[i - 1] / average_buckets[i] < 2
+                    and average_buckets[i + 1] / average_buckets[i] < 2
+                    and average_buckets[i] > average_of_average_buckets - standard_deviation
+                ):
+                    buckets_filter_list[current_dimension].append(
+                        buckets_list[current_dimension][i]
+                    )
 
     return buckets_filter_list
