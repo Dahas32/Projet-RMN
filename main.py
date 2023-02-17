@@ -23,20 +23,24 @@ def main():
         try:
             bucket_size = float(bucket_size)
         except ValueError:
-            print("veuilelr donner un nombre")
+            print("veuiler donner un nombre")
             bucket_size = input("donner la taille des buckets(ppm) voulue : ")
             correct = False
     bucket_list = rmn_bucket.determination_des_buckets(data[1], bucket_size)
+    # bucket_list_filtre = rmn_bucket.noise_threshold(data[1], bucket_list, 2000)
     bucket_int_list = rmn_bucket.calcul_des_integrales(bucket_list, data[1])
-    nb_bucket = len(bucket_int_list[0])
+    nb_buckets = [len(bucket_int_list[i]) for i in range(len(bucket_int_list))]
+    nb_max_buckets = max(nb_buckets)
     nb_dim = data[2]
-    integral_buckets_list = [
-        [bucket_int_list[i][a] for i in range(nb_dim)] for a in range(nb_bucket)
-    ]
 
-    integral_buckets_f_list = [
-        [j for j in integral_buckets_list[i] if j != 0.0] for i in range(nb_bucket)
-    ]
+    integral_buckets_list = [[] for i in range(nb_max_buckets)]
+
+    for n in range(nb_dim):
+        for b in range(nb_buckets[n]):
+            if bucket_int_list[n][b] != 0:
+                integral_buckets_list[b].append(bucket_int_list[n][b])
+
+
     delta_t = input("temps entre les spèctre : ")
     correct = False
     while not correct:
@@ -54,15 +58,15 @@ def main():
     os.makedirs(directory_export + "/img/")
     t1 = time.process_time()
     resfit_list = []
-    for b in range(nb_bucket):
+    for b in range(nb_max_buckets):
         plt.plot(
-            [i * delta_t for i in range(len(integral_buckets_f_list[b]))],
-            integral_buckets_f_list[b],
+            [i * delta_t for i in range(len(integral_buckets_list[b]))],
+            integral_buckets_list[b],
             "xb",
         )
-        resfit = rmn.fitting(integral_buckets_f_list[b], delta_t)
+        resfit = rmn.fitting(integral_buckets_list[b], delta_t)
         resfit_list.append([resfit])
-        rmn.afficher_coube_model(len(integral_buckets_f_list[b]), delta_t, *resfit[0])
+        rmn.afficher_coube_model(len(integral_buckets_list[b]), delta_t, *resfit[0])
         image = "./export/img/bucket_{}.png".format(b)
         plt.savefig(image)
         plt.close()
