@@ -28,18 +28,14 @@ def main():
             correct = False
     bucket_list = rmn_bucket.determination_des_buckets(data[1], bucket_size)
     # bucket_list_filtre = rmn_bucket.noise_threshold(data[1], bucket_list, 2000)
+    # bucket_int_list = rmn_bucket.calcul_des_integrales(bucket_list_filtre, data[1])
     bucket_int_list = rmn_bucket.calcul_des_integrales(bucket_list, data[1])
     nb_buckets = [len(bucket_int_list[i]) for i in range(len(bucket_int_list))]
-    nb_max_buckets = max(nb_buckets)
-    nb_dim = data[2]
 
-    integral_buckets_list = [[] for i in range(nb_max_buckets)]
-
-    for n in range(nb_dim):
-        for b in range(nb_buckets[n]):
-            if bucket_int_list[n][b] != 0:
-                integral_buckets_list[b].append(bucket_int_list[n][b])
-
+    integral_buckets_list, nb_max_buckets = rmn_bucket.sort_bucket(
+        bucket_int_list, nb_buckets
+    )
+    
     # to change 
     delta_t_list = [0.2, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 3, 4, 5] 
 
@@ -61,7 +57,7 @@ def main():
         image = "./export/img/bucket_{}.png".format(b)
         plt.savefig(image)
         plt.close()
-    rmn.export_xlsx(data[1], bucket_list, path, resfit_list)
+    rmn.export_xlsx(data[1], bucket_list, nb_max_buckets, path, resfit_list)
     t2 = time.process_time()
     print("duree :", t2 - t1)
     quit = input("voulez vous quitter y/n")

@@ -97,11 +97,10 @@ def afficher_coube_model(ndim, delta_list, i0, t0):
     plt.plot(x, y)
 
 
-def export_xlsx(data_list, buckets_list, input, resfit_list):
+def export_xlsx(data_list, buckets_list, nb_max_buckets, input, resfit_list):
     """data_list: [[data_dim1],[data_dim2],...]], buckets_list: [[buckets_dim1],[bucket_dim2],...],
     resfit : [int,int], input: str
     """
-    nb_bucket = len(buckets_list[0])
     parametre = 4
 
     if "/" in input:
@@ -120,15 +119,26 @@ def export_xlsx(data_list, buckets_list, input, resfit_list):
     worksheet.write(0, 0, name)
     worksheet.write(0, 1, parametre)
 
-    for i in range(nb_bucket):
-        worksheet.write(1, i, "bucket" + str(i + 1))
-        worksheet.write(2, i, data_list[0][buckets_list[0][i][0]][0])
-        worksheet.write(3, i, data_list[0][buckets_list[0][i][1]][0])
-        worksheet.write(4, i, str(resfit_list[i]))
+    for i in range(nb_max_buckets):
+        bucket_number = "bucket" + str(i + 1)
+        bucket_start = data_list[0][buckets_list[0][i][0]][0]
+        bucket_last = data_list[0][buckets_list[0][i][1]][0]
+        bucket_mid = (
+            data_list[0][buckets_list[0][i][1]][0]
+            + data_list[0][buckets_list[0][i][0]][0]
+        ) / 2
+        parameter_exp = str(resfit_list[i])
+        path_image = "./export/img/bucket_{}.png".format(str(i))
+
+        worksheet.write(1, i, bucket_number)
+        worksheet.write(2, i, bucket_start)
+        worksheet.write(3, i, bucket_mid)
+        worksheet.write(4, i, bucket_last)
+        worksheet.write(5, i, parameter_exp)
         worksheet.insert_image(
-            5,
+            6,
             i,
-            "./export/img/bucket_{}.png".format(str(i)),
+            path_image,
             {"object_position": 1, "x_scale": 0.58, "y_scale": 0.57},
         )
 

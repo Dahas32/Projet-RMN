@@ -156,3 +156,27 @@ def noise_automate(data_list, buckets_list):
                     )
 
     return buckets_filter_list
+
+def sort_bucket(bucket_int_list, nb_buckets):
+    """bucket_int_list: [[buckets_dim1],[bucket_dim2],...], nb_buckets: [nb_buckets_dim1,nb_buckets_dim2...] (value in list: int)
+    return integral_buckets_list: [integral_buckets_1,integral_buckets_2...] (value in list: int)
+    
+    this is a function who sort the integral_bucket_list
+    take off bucket integral equal 0 and remove bucket list in integral_buckets_list below a certain non-exaustive level for the fit
+    """
+    nb_max_buckets = max(nb_buckets)
+    nb_dim = len(bucket_int_list)
+    integral_buckets_list = [[] for i in range(nb_max_buckets)]
+
+    for n in range(nb_dim):
+        for b in range(nb_buckets[n]):
+            if bucket_int_list[n][b] != 0:
+                integral_buckets_list[b].append(bucket_int_list[n][b])
+
+    buckets_delete = 0
+    for i in range(nb_max_buckets):
+        if len(integral_buckets_list[i - buckets_delete]) < 7:
+            integral_buckets_list.pop(i - buckets_delete)
+            buckets_delete += 1
+
+    return integral_buckets_list, len(integral_buckets_list)
