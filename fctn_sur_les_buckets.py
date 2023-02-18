@@ -20,20 +20,23 @@ def determination_des_buckets(data_list, taille_buckets_ppm):
         buckets_list.append([])
         current_dimension = n
         index_dernier_ppm = len(data_list[current_dimension]) - 1
+        longueur_ppm = len(data_list[current_dimension])
         valeur_premier_ppm = data_list[current_dimension][0][0]
         valeur_dernier_ppm = data_list[current_dimension][-1][0]
         if abs(valeur_premier_ppm) <= abs(valeur_dernier_ppm):
-            max_valeur_ppm = abs(valeur_dernier_ppm)
+            etendu_ppm = abs(valeur_dernier_ppm - valeur_premier_ppm)
         else:
-            max_valeur_ppm = abs(valeur_premier_ppm - 1)
-        taille_buckets_index = floor(
-            (taille_buckets_ppm) * (index_dernier_ppm / max_valeur_ppm)
-        )
-        index_current_ppm = 0
+            etendu_ppm = abs(valeur_premier_ppm - valeur_dernier_ppm)
 
-        while (index_current_ppm + 1) * taille_buckets_index <= index_dernier_ppm:
-            debut_bucket = index_current_ppm * taille_buckets_index
-            fin_bucket = (index_current_ppm + 1) * taille_buckets_index
+        taille_buckets_longueur = floor((taille_buckets_ppm) * (longueur_ppm / etendu_ppm))
+        index_current_ppm = 0
+        if taille_buckets_longueur < 1:
+            taille_buckets_longueur = 1
+        if (index_current_ppm + 1) * taille_buckets_longueur >= index_dernier_ppm:
+            taille_buckets_longueur = index_dernier_ppm
+        while (index_current_ppm + 1) * taille_buckets_longueur <= index_dernier_ppm:
+            debut_bucket = index_current_ppm * taille_buckets_longueur
+            fin_bucket = (index_current_ppm + 1) * taille_buckets_longueur
             buckets_list[current_dimension] += [(debut_bucket, fin_bucket)]
             index_current_ppm += 1
 
@@ -145,7 +148,8 @@ def noise_automate(data_list, buckets_list):
                 if (
                     average_buckets[i - 1] / average_buckets[i] < 2
                     and average_buckets[i + 1] / average_buckets[i] < 2
-                    and average_buckets[i] > average_of_average_buckets - standard_deviation
+                    and average_buckets[i]
+                    > average_of_average_buckets - standard_deviation
                 ):
                     buckets_filter_list[current_dimension].append(
                         buckets_list[current_dimension][i]

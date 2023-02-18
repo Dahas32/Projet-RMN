@@ -18,6 +18,14 @@ def test_determination_buckets_1D_integer():
     assert determination_des_buckets(liste_test1, taille_bucket_ppm) == [
         [(0, 2), (2, 4), (4, 6), (6, 8)]
     ]
+    taille_bucket_ppm = 0.000001
+    assert determination_des_buckets(liste_test1, taille_bucket_ppm) == [
+        [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7), (7, 8), (8, 9)]
+    ]
+    taille_bucket_ppm = 100
+    assert determination_des_buckets(liste_test1, taille_bucket_ppm) == [
+        [(0, 9)]
+    ]
 
 
 def test_determination_buckets_1D_float():
@@ -54,6 +62,16 @@ def test_determination_buckets_2D_integer():
         [(0, 2), (2, 4), (4, 6), (6, 8)],
         [(0, 2), (2, 4), (4, 6), (6, 8)],
     ]
+    taille_bucket_ppm = 0.000001
+    assert determination_des_buckets(liste_test1, taille_bucket_ppm) == [
+        [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7), (7, 8), (8, 9)],
+        [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7), (7, 8), (8, 9)],
+    ]
+    taille_bucket_ppm = 100
+    assert determination_des_buckets(liste_test1, taille_bucket_ppm) == [
+        [(0, 9)],
+        [(0, 9)]
+    ]
 
 
 def test_determination_buckets_2D_float():
@@ -87,7 +105,7 @@ def test_noise_threshold_1D():
     det = determination_des_buckets(liste_test1, taille_bucket_ppm)
     seuil = 30
 
-    assert noise_threshold(liste_test1, det, seuil) == [[(0, 3), (18, 21)]]
+    assert noise_threshold(liste_test1, det, seuil) == [[(0, 2), (18, 20)]]
 
 
 def test_noise_threshold_2D():
