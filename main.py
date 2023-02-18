@@ -40,17 +40,8 @@ def main():
             if bucket_int_list[n][b] != 0:
                 integral_buckets_list[b].append(bucket_int_list[n][b])
 
-
-    delta_t = input("temps entre les spèctre : ")
-    correct = False
-    while not correct:
-        correct = True
-        try:
-            delta_t = float(delta_t)
-        except ValueError:
-            print("veuilelr donner un nombre")
-            delta_t = input("donner la taille des buckets(ppm) voulue : ")
-            correct = False
+    # to change 
+    delta_t_list = [0.2, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 3, 4, 5] 
 
     directory_export = "./export"
     if os.path.exists(directory_export):
@@ -60,13 +51,13 @@ def main():
     resfit_list = []
     for b in range(nb_max_buckets):
         plt.plot(
-            [i * delta_t for i in range(len(integral_buckets_list[b]))],
+            [i * delta_t_list[i] for i in range(len(integral_buckets_list[b]))],
             integral_buckets_list[b],
             "xb",
         )
-        resfit = rmn.fitting(integral_buckets_list[b], delta_t)
+        resfit = rmn.fitting(integral_buckets_list[b], delta_t_list)
         resfit_list.append([resfit])
-        rmn.afficher_coube_model(len(integral_buckets_list[b]), delta_t, *resfit[0])
+        rmn.afficher_coube_model(len(integral_buckets_list[b]), delta_t_list, *resfit[0])
         image = "./export/img/bucket_{}.png".format(b)
         plt.savefig(image)
         plt.close()

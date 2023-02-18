@@ -79,16 +79,16 @@ def model_t0(x, i0, t0):
     return i0 * (1 - 2 * exp((-x) / t0))
 
 
-def fitting(bucket_int, delta):
-    x = [i * delta for i in range(len(bucket_int))]
+def fitting(bucket_int, delta_list):
+    x = [i * delta_list[i] for i in range(len(bucket_int))]
     print(x, bucket_int)
     p0 = [100, 1]
     popt, pops = curve_fit(model_t0, x, bucket_int, p0)
     return (popt, pops)
 
 
-def afficher_coube_model(ndim, delta, i0, t0):
-    x = [i * delta for i in range(ndim)]
+def afficher_coube_model(ndim, delta_list, i0, t0):
+    x = [i * delta_list[i] for i in range(ndim)]
     y = []
     for i in x:
         # print(i)
