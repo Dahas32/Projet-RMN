@@ -101,7 +101,7 @@ def export_xlsx(data_list, buckets_list, nb_max_buckets, input, resfit_list):
     """data_list: [[data_dim1],[data_dim2],...]], buckets_list: [[buckets_dim1],[bucket_dim2],...],
     resfit : [int,int], input: str
     """
-    parametre = 4
+    parametre = 5
 
     if "/" in input:
         name = str(input.split("/")[-1])
@@ -114,7 +114,7 @@ def export_xlsx(data_list, buckets_list, nb_max_buckets, input, resfit_list):
     cell_width = 50
     cell_height = 200
     worksheet.set_column(0, len(buckets_list[0]), cell_width)
-    worksheet.set_row(5, cell_height)
+    worksheet.set_row(6, cell_height)
 
     worksheet.write(0, 0, name)
     worksheet.write(0, 1, parametre)
