@@ -28,7 +28,9 @@ def determination_des_buckets(data_list, taille_buckets_ppm):
         else:
             etendu_ppm = abs(valeur_premier_ppm - valeur_dernier_ppm)
 
-        taille_buckets_longueur = floor((taille_buckets_ppm) * (longueur_ppm / etendu_ppm))
+        taille_buckets_longueur = floor(
+            (taille_buckets_ppm) * (longueur_ppm / etendu_ppm)
+        )
         index_current_ppm = 0
         if taille_buckets_longueur < 1:
             taille_buckets_longueur = 1
@@ -112,6 +114,13 @@ def noise_threshold(data_list, buckets_list, threshold):
 def noise_automate(data_list, buckets_list):
     """data_list: [[data_dim1],[data_dim2],...]], buckets_list: [[buckets_dim1],[bucket_dim2],...]
     return buckets_filter_list : [[(first,last),...],[buckets_filter_list_dim2]...]
+    
+    this is a function that remove noise
+    make in each dim average abs intensity of each bucket and from average of average make a standard deviation
+    conditon : if average abs intensity of bucket is lower of a certain factor
+               if average abs intensity of bucket is lower to average of average - standard deviation
+    is a noise
+
     """
     number_of_dimension = len(data_list)
     buckets_filter_list = []
@@ -156,6 +165,77 @@ def noise_automate(data_list, buckets_list):
                     )
 
     return buckets_filter_list
+
+
+def noise_spectre(data_list, buckets_list):
+    """data_list: [[data_dim1],[data_dim2],...]], buckets_list: [[buckets_dim1],[bucket_dim2],...]
+    return buckets_filter_list : [[(first,last),...],[buckets_filter_list_dim2]...]
+
+    this is a function that remove noise
+    compare one bucket of each dim the gap of intensity ex: dim1_bucket_1 - dim2_bucket_1
+    if not much gap about sum of each dim in one bucket is noise
+    the "not much gap" its if gap under average
+    """
+
+    number_of_dimension = len(data_list)
+    bucket_intensity_list = [[] for i in range(number_of_dimension)]
+    bucket_gaps_list = [[] for i in range(len(buckets_list[0]))]
+    buckets_filter_list = []
+
+    for n in range(number_of_dimension):
+        buckets_filter_list.append([])
+        current_dimension = n
+
+        if len(bucket_intensity_list[n]) == 0:
+            for b in range(len(buckets_list[current_dimension])):
+                sum_intesity_bucket = 0
+                for i in range(
+                    buckets_list[current_dimension][b][0],
+                    buckets_list[current_dimension][b][1],
+                    1,
+                ):
+                    sum_intesity_bucket += data_list[current_dimension][i][1]
+                bucket_intensity_list[n].append(int(sum_intesity_bucket))
+
+        for s in range(n + 1, number_of_dimension):
+            for b in range(len(buckets_list[s])):
+                if len(bucket_intensity_list[s]) <= b:
+                    sum_intesity_bucket = 0
+                    for i in range(buckets_list[s][b][0], buckets_list[s][b][1], 1):
+                        sum_intesity_bucket += data_list[s][i][1]
+                    bucket_intensity_list[s].append(int(sum_intesity_bucket))
+
+                if abs(bucket_intensity_list[n][b]) >= bucket_intensity_list[s][b]:
+                    bucket_diff = abs(
+                        bucket_intensity_list[n][b] - bucket_intensity_list[s][b]
+                    )
+                else:
+                    bucket_diff = abs(
+                        bucket_intensity_list[s][b] - bucket_intensity_list[n][b]
+                    )
+                bucket_gaps_list[b].append(bucket_diff)
+
+    bucket_gap_list = []
+    average_gap_bucket = 0
+    for bucket in bucket_gaps_list:
+        sum_gap_bucket = 0
+        for gap in bucket:
+            sum_gap_bucket += gap
+        average_gap_bucket += sum_gap_bucket
+        bucket_gap_list.append(sum_gap_bucket)
+    average_gap_bucket = int(average_gap_bucket // len(bucket_gaps_list))
+
+    for i in range(len(bucket_gap_list)):
+        if bucket_gap_list[i] < sum_gap_bucket:
+            bucket_gap_list[i] = 0
+
+    for n in range(number_of_dimension):
+        for i in range (len(bucket_gap_list)):
+            if bucket_gap_list[i] != 0:
+                buckets_filter_list[n].append(buckets_list[n][i])
+
+    return buckets_filter_list
+
 
 def sort_bucket(bucket_int_list, nb_buckets):
     """bucket_int_list: [[buckets_dim1],[bucket_dim2],...], nb_buckets: [nb_buckets_dim1,nb_buckets_dim2...] (value in list: int)
