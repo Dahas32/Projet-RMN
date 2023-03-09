@@ -8,7 +8,7 @@ import xlsxwriter
 
 def read_rmn(file: str):
     """read the "File" and return a list w/ all the needed information ->
-    [n_point,[data_dim1,data_dim2,...]] where data_dim1 is a list of couple
+    [n_point,[data_dim1,data_dim2,...],nDim,Vdlist] where data_dim1 is a list of couple
     the couple is two float like this (ppm,amplitude)"""
     # I will use [a:-1] to remove useless part of the data.
     o_file = open(file, "r")
@@ -21,8 +21,26 @@ def read_rmn(file: str):
     abs_f1 = False
     abs_f2 = False
     vardim = False
+    vdlist_start = False
+    vdlist = False
     n_dim = 1
     for i in enumerate(o_file_list, 0):  # the data isn't alway at the same place.
+        if not (vdlist_start) and not vdlist and ("##$BRUKER FILE EXP=vdlist" in i[1]):
+            Vdlist = []
+            vdlist_start = True
+        elif vdlist_start and "##" not in i[1][:3]:
+            print(i[0], i[1])
+            temp = i[1][3:]
+            for j in range(len(temp)):
+                if (not temp[j].isdecimal()) and (not temp[j] == "."):
+                    temp = temp[:j]
+                    break
+            Vdlist.append(float(temp))
+
+        elif vdlist_start and "##" in i[1][:3]:
+            vdlist_start = False
+            vdlist = True
+
         if not (XDIM) and ("##NPOINTS" in i[1]) and ("$$" not in i[1]):
             # print(i[1])
             # print()
@@ -58,7 +76,7 @@ def read_rmn(file: str):
             current_dimension += 1
             start = i[0] + 3
         # print(n_point, data_list)
-    return [n_point, data_list, n_dim]
+    return [n_point, data_list, n_dim, Vdlist]
 
 
 def afficher(rawdata, dim):
@@ -136,15 +154,12 @@ def export_xlsx(data_list, buckets_list, nb_max_buckets, input, resfit_list):
         worksheet.write(4, i, bucket_last)
         worksheet.write(5, i, parameter_exp)
         worksheet.insert_image(
-            6,
-            i,
-            path_image,
-            {"object_position": 1, "x_scale": 0.58, "y_scale": 0.57},
+            6, i, path_image, {"object_position": 1, "x_scale": 0.58, "y_scale": 0.57},
         )
 
     workbook.close()
 
 
 if __name__ == "__main__":
-    afficher_coube_model(12, 7.7, 7.90304580e04, -7.94691988e07)
-    plt.show()
+    res = read_rmn("test_data/serum_dynamic_221125.dx")
+    print(res[-1])
