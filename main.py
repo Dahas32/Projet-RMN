@@ -8,11 +8,17 @@ import matplotlib.pyplot as plt
 import time
 import os
 import shutil
+import tkinter as tk
+from tkinter import ttk
+from fctn_tk import selection_fichier
+from tkinter import filedialog
 
 
-def main():
+def main(the_path):
     """main function"""
-    path = input("file path")
+
+    path = the_path
+    """path = input("file path")"""
     data = rmn.read_rmn(path)
     rmn.afficher(data, 5)
     plt.show()
@@ -35,9 +41,9 @@ def main():
     integral_buckets_list, nb_max_buckets = rmn_bucket.sort_bucket(
         bucket_int_list, nb_buckets
     )
-    
-    # to change 
-    delta_t_list = [0.2, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 3, 4, 5] 
+
+    # to change
+    delta_t_list = [0.2, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 3, 4, 5]
 
     directory_export = "./export"
     if os.path.exists(directory_export):
@@ -53,7 +59,9 @@ def main():
         )
         resfit = rmn.fitting(integral_buckets_list[b], delta_t_list)
         resfit_list.append([resfit])
-        rmn.afficher_coube_model(len(integral_buckets_list[b]), delta_t_list, *resfit[0])
+        rmn.afficher_coube_model(
+            len(integral_buckets_list[b]), delta_t_list, *resfit[0]
+        )
         image = "./export/img/bucket_{}.png".format(b)
         plt.savefig(image)
         plt.close()
@@ -66,4 +74,15 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    root = tk.Tk()
+    root.title("Titre")
+    widget = tk.Canvas(root, width=500, height=400, background="white")
+    widget.pack(side="top")
+    widget.create_text(100, 100, text="Bla bla bla", font="Arial 20", fill="black")
+    bouton_tps_relaxation = tk.Button(
+        root,
+        text="Extraction du temps de relaxation",
+        command=lambda: [main(selection_fichier(root))],
+    )
+    bouton_tps_relaxation.pack()
+    root.mainloop()
