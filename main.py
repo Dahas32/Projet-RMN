@@ -57,7 +57,7 @@ def main():
         image = "./export/img/bucket_{}.png".format(b)
         plt.savefig(image)
         plt.close()
-    rmn.export_xlsx(data[1], bucket_list, nb_max_buckets, path, resfit_list)
+    rmn.export_xlsx(data[1], bucket_list, path, resfit_list)
     t2 = time.process_time()
     print("duree :", t2 - t1)
     quit = input("voulez vous quitter y/n")
