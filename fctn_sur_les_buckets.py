@@ -230,7 +230,7 @@ def noise_spectre(data_list, buckets_list):
             bucket_gap_list[i] = 0
 
     for n in range(number_of_dimension):
-        for i in range (len(bucket_gap_list)):
+        for i in range(len(bucket_gap_list)):
             if bucket_gap_list[i] != 0:
                 buckets_filter_list[n].append(buckets_list[n][i])
 
